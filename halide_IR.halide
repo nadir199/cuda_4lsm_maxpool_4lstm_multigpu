@@ -1,0 +1,156 @@
+assert((reinterpret(uint64, _C475_b72.buffer) != (uint64)0), halide_error_buffer_argument_is_null("_C475_b72"))
+assert((reinterpret(uint64, _C472_b71.buffer) != (uint64)0), halide_error_buffer_argument_is_null("_C472_b71"))
+let _C472_b71 = _halide_buffer_get_host(_C472_b71.buffer)
+let _C475_b72 = _halide_buffer_get_host(_C475_b72.buffer)
+produce  {
+  allocate _C82_b12[uint8 * 2 * 50 * 9]
+  allocate _C77_b11[uint8 * 2 * 5 * 9]
+  allocate _C469_b70[int32 * 1]
+  let _C452_b69 = tiramisu_cuda_malloc((uint64)6553600)
+  allocate _C448_b68[int32 * 5 * 9]
+  allocate _C420_b63[uint8 * 50 * 9]
+  allocate _C416_b62[uint8 * 5 * 9]
+  allocate _C372_b57[int32 * 5 * 9]
+  allocate _C363_b55[int32 * 1]
+  allocate _C339_b51[int32 * 5 * 9]
+  allocate _C311_b46[uint8 * 50 * 9]
+  allocate _C307_b45[uint8 * 5 * 9]
+  allocate _C266_b39[int32 * 5 * 9]
+  allocate _C254_b38[int32 * 5 * 9]
+  allocate _C221_b33[uint8 * 2 * 50 * 9]
+  allocate _C216_b32[uint8 * 2 * 5 * 9]
+  allocate _C17_b4[int32 * 1]
+  allocate _C159_b25[int32 * 1]
+  allocate _C127_b18[int32 * 5 * 9]
+  allocate _C115_b17[int32 * 5 * 9]
+  let buf_x_gpu1 = tiramisu_cuda_malloc((uint64)13107200)
+  let buf_weights_gpu1 = tiramisu_cuda_malloc((uint64)33554432)
+  let buf_biases_gpu1 = tiramisu_cuda_malloc((uint64)32768)
+  let buf_tmp_gpu1 = tiramisu_cuda_malloc((uint64)52428800)
+  let buf_weights_T_gpu1 = tiramisu_cuda_malloc((uint64)33554432)
+  let buf_h_gpu1 = tiramisu_cuda_malloc((uint64)66191360)
+  let buf_c_gpu1 = tiramisu_cuda_malloc((uint64)52953088)
+  let buf_weights_gpu2 = tiramisu_cuda_malloc((uint64)33554432)
+  let buf_biases_gpu2 = tiramisu_cuda_malloc((uint64)32768)
+  let buf_tmp_gpu2 = tiramisu_cuda_malloc((uint64)52428800)
+  let buf_weights_T_gpu2 = tiramisu_cuda_malloc((uint64)33554432)
+  let buf_h_gpu2 = tiramisu_cuda_malloc((uint64)66191360)
+  let buf_c_gpu2 = tiramisu_cuda_malloc((uint64)52953088)
+  let buf_weights2_gpu2 = tiramisu_cuda_malloc((uint64)33554432)
+  let buf_biases2_gpu2 = tiramisu_cuda_malloc((uint64)32768)
+  let buf_weights2_T_gpu2 = tiramisu_cuda_malloc((uint64)33554432)
+  let buf_weights2_gpu3 = tiramisu_cuda_malloc((uint64)33554432)
+  let buf_biases2_gpu3 = tiramisu_cuda_malloc((uint64)32768)
+  let buf_tmp2_gpu3 = tiramisu_cuda_malloc((uint64)26214400)
+  let buf_weights2_T_gpu3 = tiramisu_cuda_malloc((uint64)33554432)
+  let buf_h2_gpu3 = tiramisu_cuda_malloc((uint64)33423360)
+  let buf_c2_gpu3 = tiramisu_cuda_malloc((uint64)26738688)
+  _C17_b4[0] = tiramisu_cuda_set_device(0)
+  free _C17_b4
+  tiramisu_cuda_memcpy_to_device(buf_weights_gpu1, tiramisu_address_of_float32(buf_Weights_cpu.buffer, 0), (uint64)33554432)
+  tiramisu_cuda_memcpy_to_device(buf_biases_gpu1, tiramisu_address_of_float32(buf_biases_cpu.buffer, 0), (uint64)32768)
+  tiramisu_cuda_memcpy_to_device(buf_x_gpu1, tiramisu_address_of_float32(buf_x_cpu.buffer, 0), (uint64)13107200)
+  _kernel_0_wrapper()
+  _kernel_1_wrapper(buf_h_gpu1)
+  _kernel_2_wrapper(buf_c_gpu1)
+  _kernel_3_wrapper(buf_h_gpu1, buf_x_gpu1)
+  _C159_b25[0] = tiramisu_cuda_set_device(0)
+  free _C159_b25
+  tiramisu_cuda_memcpy_to_device(buf_weights_gpu2, tiramisu_address_of_float32(buf_Weights_cpu.buffer, 0), (uint64)33554432)
+  tiramisu_cuda_memcpy_to_device(buf_biases_gpu2, tiramisu_address_of_float32(buf_biases_cpu.buffer, 0), (uint64)32768)
+  tiramisu_cuda_memcpy_to_device(buf_weights2_gpu2, tiramisu_address_of_float32(buf_Weights2_cpu.buffer, 0), (uint64)33554432)
+  tiramisu_cuda_memcpy_to_device(buf_biases2_gpu2, tiramisu_address_of_float32(buf_biases2_cpu.buffer, 0), (uint64)32768)
+  _kernel_4_wrapper()
+  _kernel_5_wrapper(buf_weights2_T_gpu2, buf_weights2_gpu2)
+  _kernel_6_wrapper(buf_h_gpu2)
+  _kernel_7_wrapper(buf_c_gpu2)
+  _kernel_8_wrapper(buf_h_gpu2)
+  _kernel_9_wrapper(buf_c_gpu2)
+  _C363_b55[0] = tiramisu_cuda_set_device(0)
+  free _C363_b55
+  tiramisu_cuda_memcpy_to_device(buf_weights2_gpu3, tiramisu_address_of_float32(buf_Weights2_cpu.buffer, 0), (uint64)33554432)
+  tiramisu_cuda_memcpy_to_device(buf_biases2_gpu3, tiramisu_address_of_float32(buf_biases2_cpu.buffer, 0), (uint64)32768)
+  _C472_b71[0] = get_time(0)
+  _kernel_10_wrapper()
+  _kernel_11_wrapper(buf_h2_gpu3)
+  _kernel_12_wrapper(buf_c2_gpu3)
+  for (c1, 0, 13) {
+    parallel (c3, max((c1 + -4), 0), ((min(c1, 8) - max((c1 + -4), 0)) + 1)) {
+      if ((c3 < 3)) {
+        _C127_b18[((c1 - c3) + (c3*5))] = tiramisu_cuda_set_device(0)
+      }
+      for (c5, 0, 2) {
+        if ((c3 < 3)) {
+          _C77_b11[((c5 + ((c1 - c3)*2)) + (c3*10))] = tiramisu_cublas_sgemm(buf_h_gpu1, buf_weights_T_gpu1, buf_tmp_gpu1, (uint64)640, (uint64)2048, (uint64)512, 1.000000f, 0.000000f, (uint64)0, (uint64)0, (uint64)0, uint64(((((c3*101) + ((((c1 - c3)*2) + c5)*10))*32768) + 32768)), uint64((c3*2097152)), uint64(((((c1 - c3)*2) + c5)*1310720)), (uint1)0, (uint1)0)
+        }
+        for (c7, 0, 10) {
+          if ((c3 < 3)) {
+            _C82_b12[((c5 + ((((c1 - c3)*10) + c7)*2)) + (c3*100))] = tiramisu_cublas_sgemm(buf_h_gpu1, buf_weights_T_gpu1, buf_tmp_gpu1, (uint64)64, (uint64)2048, (uint64)512, 1.000000f, 1.000000f, (uint64)0, (uint64)0, (uint64)0, uint64(((((c3*101) + (((((c1 - c3)*10) + c7)*2) + c5))*32768) + 3309568)), uint64(((c3*2097152) + 1048576)), uint64(((((((c1 - c3)*10) + c7)*2) + c5)*131072)), (uint1)0, (uint1)0)
+          }
+          _kernel_13_wrapper(c1, c3, c5, c7, buf_biases_gpu1, buf_c_gpu1, buf_h_gpu1, buf_tmp_gpu1)
+        }
+      }
+      _C115_b17[((c1 - c3) + (c3*5))] = tiramisu_cuda_stream_synchronize(0)
+      if (((c3 < 6) && (2 < c3))) {
+        _C266_b39[((c1 - c3) + (c3*5))] = tiramisu_cuda_set_device(0)
+      }
+      for (c5, 0, 2) {
+        if ((c3 == 3)) {
+          _C216_b32[((c5 + (c1*2)) + 24)] = tiramisu_cublas_sgemm(buf_h_gpu2, buf_weights_T_gpu2, buf_tmp_gpu2, (uint64)640, (uint64)2048, (uint64)512, 1.000000f, 0.000000f, (uint64)0, (uint64)0, (uint64)0, uint64(((((c1*2) + c5)*327680) + 7995392)), (uint64)6291456, uint64(((((c1*2) + c5)*1310720) + -7864320)), (uint1)0, (uint1)0)
+        }
+        for (c7, 0, 10) {
+          if ((c3 == 3)) {
+            _C221_b33[((c5 + (((c1*10) + c7)*2)) + 240)] = tiramisu_cublas_sgemm(buf_h_gpu2, buf_weights_T_gpu2, buf_tmp_gpu2, (uint64)64, (uint64)2048, (uint64)512, 1.000000f, 1.000000f, (uint64)0, (uint64)0, (uint64)0, uint64(((((((c1*10) + c7)*2) + c5)*32768) + 11272192)), (uint64)7340032, uint64(((((((c1*10) + c7)*2) + c5)*131072) + -7864320)), (uint1)0, (uint1)0)
+          }
+          _kernel_14_wrapper(c1, c3, c5, c7, buf_biases_gpu2, buf_c_gpu2, buf_h_gpu2, buf_tmp_gpu2)
+        }
+      }
+      _C254_b38[((c1 - c3) + (c3*5))] = tiramisu_cuda_stream_synchronize(0)
+      _kernel_15_wrapper(c1, c3, buf_h_gpu2)
+      if ((c3 == 5)) {
+        _C307_b45[(c1 + 20)] = tiramisu_cublas_sgemm(buf_h_gpu2, buf_weights2_T_gpu2, buf_tmp_gpu2, (uint64)640, (uint64)2048, (uint64)512, 1.000000f, 0.000000f, (uint64)0, (uint64)0, (uint64)0, uint64(((c1*327680) + -1605632)), (uint64)0, uint64(((c1*1310720) + -6553600)), (uint1)0, (uint1)0)
+      }
+      for (c5, 0, 10) {
+        if ((c3 == 5)) {
+          _C311_b46[(((c1*10) + c5) + 200)] = tiramisu_cublas_sgemm(buf_h_gpu2, buf_weights2_T_gpu2, buf_tmp_gpu2, (uint64)64, (uint64)2048, (uint64)512, 1.000000f, 1.000000f, (uint64)0, (uint64)0, (uint64)0, uint64(((((c1*10) + c5)*32768) + 32768)), (uint64)1048576, uint64(((((c1*10) + c5)*131072) + -6553600)), (uint1)0, (uint1)0)
+        }
+        _kernel_16_wrapper(c1, c3, c5, buf_biases2_gpu2, buf_c_gpu2, buf_h_gpu2, buf_tmp_gpu2)
+      }
+      _C339_b51[((c1 - c3) + (c3*5))] = tiramisu_cuda_stream_synchronize(0)
+      if ((5 < c3)) {
+        _C372_b57[((c1 - c3) + (c3*5))] = tiramisu_cuda_set_device(0)
+      }
+      if ((5 < c3)) {
+        _C416_b62[((c1 - c3) + (c3*5))] = tiramisu_cublas_sgemm(buf_h2_gpu3, buf_weights2_T_gpu3, buf_tmp2_gpu3, (uint64)640, (uint64)2048, (uint64)512, 1.000000f, 0.000000f, (uint64)0, (uint64)0, (uint64)0, uint64(((((c3*51) + ((c1 - c3)*10))*32768) + -8323072)), uint64(((c3*2097152) + -10485760)), uint64(((c1 - c3)*1310720)), (uint1)0, (uint1)0)
+      }
+      for (c5, 0, 10) {
+        if ((5 < c3)) {
+          _C420_b63[((((c1 - c3)*10) + c5) + (c3*50))] = tiramisu_cublas_sgemm(buf_h2_gpu3, buf_weights2_T_gpu3, buf_tmp2_gpu3, (uint64)64, (uint64)2048, (uint64)512, 1.000000f, 1.000000f, (uint64)0, (uint64)0, (uint64)0, uint64(((((c3*51) + (((c1 - c3)*10) + c5))*32768) + -6684672)), uint64(((c3*2097152) + -9437184)), uint64(((((c1 - c3)*10) + c5)*131072)), (uint1)0, (uint1)0)
+        }
+        _kernel_17_wrapper(c1, c3, c5, buf_biases2_gpu3, buf_c2_gpu3, buf_h2_gpu3, buf_tmp2_gpu3)
+      }
+      _C448_b68[((c1 - c3) + (c3*5))] = tiramisu_cuda_stream_synchronize(0)
+    }
+  }
+  free _C82_b12
+  free _C77_b11
+  free _C448_b68
+  free _C420_b63
+  free _C416_b62
+  free _C372_b57
+  free _C339_b51
+  free _C311_b46
+  free _C307_b45
+  free _C266_b39
+  free _C254_b38
+  free _C221_b33
+  free _C216_b32
+  free _C127_b18
+  free _C115_b17
+  _kernel_18_wrapper(_C452_b69, buf_h2_gpu3)
+  _C469_b70[0] = tiramisu_cuda_stream_synchronize(0)
+  free _C469_b70
+  _C475_b72[0] = get_time(0)
+  tiramisu_cuda_memcpy_to_host(tiramisu_address_of_float32(buf_y_cpu.buffer, 0), _C452_b69, (uint64)6553600)
+  tiramisu_cuda_free(_C452_b69)
+}
