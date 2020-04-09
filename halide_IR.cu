@@ -118,15 +118,15 @@ void deepspeech2(float *buf_Weights_cpu, float *buf_biases_cpu,
     _kernel_11_wrapper(buf_h2_gpu3);
     _kernel_12_wrapper(buf_c2_gpu3);
 
-    for(int c1=0; c1<13; c1++){
-        for(int c3  =max(c1-4, 0); c3 < min(c1, 8) - max(c1-4, 0) +1; c3++){
+    for(int c1=0; c1<(SEQ_LENGTH/GEMM_BATCH) / 2 + 2 * NUM_LAYERS; c1++){
+        for(int c3  =max(c1-(SEQ_LENGTH/GEMM_BATCH) / 2 + 1, 0); c3 < min(c1, 2 * NUM_LAYERS) - max(c1-(SEQ_LENGTH/GEMM_BATCH) / 2 + 1, 0) +1; c3++){
             // std::cout << "s0 = " << c1 << " , l = " << c3 << std::endl;
             if(c3 < 3){
                 wrapper_cuda_set_device(GPU1_ID);
                 for (int c5 = 0; c5 < 2; c5++) {
-                    wrapper_cublas_sgemm(buf_h_gpu1, buf_weights_T_gpu1, buf_tmp_gpu1, (uint64_t)640, (uint64_t)2048, (uint64_t)512, 1.000000f, 0.000000f, (uint64_t)0, (uint64_t)0, (uint64_t)0, uint64_t(((((c3*101) + ((((c1 - c3)*2) + c5)*10))*32768) + 32768)), uint64_t((c3*2097152)), uint64_t(((((c1 - c3)*2) + c5)*1310720)), (uint32_t)0, (uint32_t)0);
-                    for (int c7 = 0; c7 < 10; c7++) {
-                        wrapper_cublas_sgemm(buf_h_gpu1, buf_weights_T_gpu1, buf_tmp_gpu1, (uint64_t)64, (uint64_t)2048, (uint64_t)512, 1.000000f, 1.000000f, (uint64_t)0, (uint64_t)0, (uint64_t)0, uint64_t(((((c3*101) + (((((c1 - c3)*10) + c7)*2) + c5))*32768) + 3309568)), uint64_t(((c3*2097152) + 1048576)), uint64_t(((((((c1 - c3)*10) + c7)*2) + c5)*131072)), (uint32_t)0, (uint32_t)0);
+                    wrapper_cublas_sgemm(buf_h_gpu1, buf_weights_T_gpu1, buf_tmp_gpu1, (uint64_t)(GEMM_BATCH * BATCH_SIZE), (uint64_t)(4 * FEATURE_SIZE), (uint64_t)FEATURE_SIZE, 1.000000f, 0.000000f, (uint64_t)0, (uint64_t)0, (uint64_t)0, uint64_t(((((c3*(SEQ_LENGTH + 1)) + ((((c1 - c3)*2) + c5)*GEMM_BATCH))*BATCH_SIZE * FEATURE_SIZE) + BATCH_SIZE * FEATURE_SIZE)), uint64_t((c3 * 2 * 4 * FEATURE_SIZE * FEATURE_SIZE)), uint64_t(((((c1 - c3)*2) + c5) * GEMM_BATCH * BATCH_SIZE * 4 * FEATURE_SIZE)), (uint32_t)0, (uint32_t)0);
+                    for (int c7 = 0; c7 < GEMM_BATCH; c7++) {
+                        wrapper_cublas_sgemm(buf_h_gpu1, buf_weights_T_gpu1, buf_tmp_gpu1, (uint64_t)BATCH_SIZE, (uint64_t)(4 * FEATURE_SIZE), (uint64_t)FEATURE_SIZE, 1.000000f, 1.000000f, (uint64_t)0, (uint64_t)0, (uint64_t)0, uint64_t(((((c3*(SEQ_LENGTH + 1)) + (((((c1 - c3)*GEMM_BATCH) + c7)*2) + c5))* BATCH_SIZE * FEATURE_SIZE) + (SEQ_LENGTH + 1) * BATCH_SIZE * FEATURE_SIZE)), uint64_t(((c3*2 * 4 * FEATURE_SIZE * FEATURE_SIZE) + 4 * FEATURE_SIZE * FEATURE_SIZE)), uint64_t(((((((c1 - c3)*GEMM_BATCH) + c7)*2) + c5)* BATCH_SIZE * 4 * FEATURE_SIZE)), (uint32_t)0, (uint32_t)0);
                         _kernel_13_wrapper(c1, c3, c5, c7, buf_biases_gpu1, buf_c_gpu1, buf_h_gpu1, buf_tmp_gpu1);
                     }
                 }
@@ -144,10 +144,10 @@ void deepspeech2(float *buf_Weights_cpu, float *buf_biases_cpu,
             }
             if ((c3 == 3))
               for (int c5 = 0; c5 < 2; c5++) {
-                  wrapper_cublas_sgemm(buf_h_gpu2, buf_weights_T_gpu2, buf_tmp_gpu2, (uint64_t)640, (uint64_t)2048, (uint64_t)512, 1.000000f, 0.000000f, (uint64_t)0, (uint64_t)0, (uint64_t)0, uint64_t(((((c1*2) + c5)*327680) + 7995392)), (uint64_t)6291456, uint64_t(((((c1*2) + c5)*1310720) + -7864320)), (uint32_t)0, (uint32_t)0);
+                  wrapper_cublas_sgemm(buf_h_gpu2, buf_weights_T_gpu2, buf_tmp_gpu2, (uint64_t)(GEMM_BATCH * BATCH_SIZE), (uint64_t)(4 * FEATURE_SIZE), (uint64_t)FEATURE_SIZE, 1.000000f, 0.000000f, (uint64_t)0, (uint64_t)0, (uint64_t)0, uint64_t(((((c1*2) + c5)*GEMM_BATCH*BATCH_SIZE*FEATURE_SIZE) + (3 * (SEQ_LENGTH + 1) - 3 * 2 * GEMM_BATCH + 1) * BATCH_SIZE * FEATURE_SIZE)), (uint64_t)6291456, uint64_t(((((c1*2) + c5)*1310720) + -7864320)), (uint32_t)0, (uint32_t)0);
 
-                  for (int c7 = 0; c7 < 10; c7++) {
-                      wrapper_cublas_sgemm(buf_h_gpu2, buf_weights_T_gpu2, buf_tmp_gpu2, (uint64_t)64, (uint64_t)2048, (uint64_t)512, 1.000000f, 1.000000f, (uint64_t)0, (uint64_t)0, (uint64_t)0, uint64_t(((((((c1*10) + c7)*2) + c5)*32768) + 11272192)), (uint64_t)7340032, uint64_t(((((((c1*10) + c7)*2) + c5)*131072) + -7864320)), (uint32_t)0, (uint32_t)0);
+                  for (int c7 = 0; c7 < GEMM_BATCH; c7++) {
+                      wrapper_cublas_sgemm(buf_h_gpu2, buf_weights_T_gpu2, buf_tmp_gpu2, (uint64_t)BATCH_SIZE, (uint64_t)(4 * FEATURE_SIZE), (uint64_t)FEATURE_SIZE, 1.000000f, 1.000000f, (uint64_t)0, (uint64_t)0, (uint64_t)0, uint64_t(((((((c1*GEMM_BATCH) + c7)*2) + c5)*BATCH_SIZE * FEATURE_SIZE) + (4 * (SEQ_LENGTH + 1) - 3 * 2 * GEMM_BATCH) * BATCH_SIZE * FEATURE_SIZE)), (uint64_t)(7 * 4 * FEATURE_SIZE * FEATURE_SIZE), uint64_t(((((((c1*GEMM_BATCH) + c7)*2) + c5)*BATCH_SIZE * 4 * FEATURE_SIZE) - 3 * GEMM_BATCH * 2 * BATCH_SIZE * 4 * FEATURE_SIZE)), (uint32_t)0, (uint32_t)0);
                       _kernel_14_wrapper(c1, c3, c5, c7, buf_biases_gpu2, buf_c_gpu2, buf_h_gpu2, buf_tmp_gpu2);
                   }
               }
@@ -156,14 +156,14 @@ void deepspeech2(float *buf_Weights_cpu, float *buf_biases_cpu,
             if ((c3 == 4))
               _kernel_15_wrapper(c1, c3, buf_h_gpu2);
             if ((c3 == 5)) {
-                wrapper_cublas_sgemm(buf_h_gpu2, buf_weights2_T_gpu2, buf_tmp_gpu2, (uint64_t)640, (uint64_t)2048, (uint64_t)512, 1.000000f, 0.000000f, (uint64_t)0, (uint64_t)0, (uint64_t)0, uint64_t(((c1*327680) + -1605632)), (uint64_t)0, uint64_t(((c1*1310720) + -6553600)), (uint32_t)0, (uint32_t)0);
-            }
-            if ((c3 == 5))
-              for (int c5 = 0; c5 < 10; c5++) {
-                  wrapper_cublas_sgemm(buf_h_gpu2, buf_weights2_T_gpu2, buf_tmp_gpu2, (uint64_t)64, (uint64_t)2048, (uint64_t)512, 1.000000f, 1.000000f, (uint64_t)0, (uint64_t)0, (uint64_t)0, uint64_t(((((c1*10) + c5)*32768) + 32768)), (uint64_t)1048576, uint64_t(((((c1*10) + c5)*131072) + -6553600)), (uint32_t)0, (uint32_t)0);
+              wrapper_cublas_sgemm(buf_h_gpu2, buf_weights2_T_gpu2, buf_tmp_gpu2, (uint64_t)(GEMM_BATCH * BATCH_SIZE), (uint64_t)(4 * FEATURE_SIZE), (uint64_t)FEATURE_SIZE, 1.000000f, 0.000000f, (uint64_t)0, (uint64_t)0, (uint64_t)0, uint64_t(((c1*327680) - (5 * GEMM_BATCH - 1) * BATCH_SIZE * FEATURE_SIZE)), (uint64_t)0, uint64_t(((c1 * GEMM_BATCH * BATCH_SIZE * 4 * FEATURE_SIZE) - 5 * GEMM_BATCH * BATCH_SIZE * 4 * FEATURE_SIZE)), (uint32_t)0, (uint32_t)0);
+
+              for (int c5 = 0; c5 < GEMM_BATCH; c5++) {
+                  wrapper_cublas_sgemm(buf_h_gpu2, buf_weights2_T_gpu2, buf_tmp_gpu2, (uint64_t)BATCH_SIZE, (uint64_t)(4 * FEATURE_SIZE), (uint64_t)FEATURE_SIZE, 1.000000f, 1.000000f, (uint64_t)0, (uint64_t)0, (uint64_t)0, uint64_t(((((c1 * GEMM_BATCH) + c5)*BATCH_SIZE*FEATURE_SIZE) + (SEQ_LENGTH/2 + 1 - 5 * GEMM_BATCH) * BATCH_SIZE * FEATURE_SIZE)), (uint64_t)(4 * FEATURE_SIZE * FEATURE_SIZE), uint64_t(((((c1 * GEMM_BATCH) + c5) * BATCH_SIZE * 4 * FEATURE_SIZE) - 5 * GEMM_BATCH * BATCH_SIZE * 4 * FEATURE_SIZE)), (uint32_t)0, (uint32_t)0);
 
                   _kernel_16_wrapper(c1, c3, c5, buf_biases2_gpu2, buf_c_gpu2, buf_h_gpu2, buf_tmp_gpu2);
               }
+            }
             wrapper_cuda_stream_synchronize(0);
 
             // Memcpy GPU0 to GPU1
@@ -177,10 +177,10 @@ void deepspeech2(float *buf_Weights_cpu, float *buf_biases_cpu,
 
             if ((5 < c3)) {
                 wrapper_cuda_set_device(GPU3_ID);
-                wrapper_cublas_sgemm(buf_h2_gpu3, buf_weights2_T_gpu3, buf_tmp2_gpu3, (uint64_t)640, (uint64_t)2048, (uint64_t)512, 1.000000f, 0.000000f, (uint64_t)0, (uint64_t)0, (uint64_t)0, uint64_t(((((c3*51) + ((c1 - c3)*10))*32768) + -8323072)), uint64_t(((c3*2097152) + -10485760)), uint64_t(((c1 - c3)*1310720)), (uint32_t)0, (uint32_t)0);
+                wrapper_cublas_sgemm(buf_h2_gpu3, buf_weights2_T_gpu3, buf_tmp2_gpu3, (uint64_t)(BATCH_SIZE * GEMM_BATCH), (uint64_t)(4 * FEATURE_SIZE), (uint64_t)FEATURE_SIZE, 1.000000f, 0.000000f, (uint64_t)0, (uint64_t)0, (uint64_t)0, uint64_t((((c3*(SEQ_LENGTH/2 + 1)) + ((c1 - c3)*GEMM_BATCH))*BATCH_SIZE * FEATURE_SIZE - (5 * (SEQ_LENGTH/2 + 1) - 1) * BATCH_SIZE * FEATURE_SIZE)), uint64_t(((c3 * 2 * 4 * FEATURE_SIZE * FEATURE_SIZE) - (5 * 2 * 4 * FEATURE_SIZE * FEATURE_SIZE))), uint64_t(((c1 - c3)*GEMM_BATCH*BATCH_SIZE*4*FEATURE_SIZE)), (uint32_t)0, (uint32_t)0);
 
                 for (int c5 = 0; c5 < 10; c5++) {
-                    wrapper_cublas_sgemm(buf_h2_gpu3, buf_weights2_T_gpu3, buf_tmp2_gpu3, (uint64_t)64, (uint64_t)2048, (uint64_t)512, 1.000000f, 1.000000f, (uint64_t)0, (uint64_t)0, (uint64_t)0, uint64_t(((((c3*51) + (((c1 - c3)*10) + c5))*32768) + -6684672)), uint64_t(((c3*2097152) + -9437184)), uint64_t(((((c1 - c3)*10) + c5)*131072)), (uint32_t)0, (uint32_t)0);
+                    wrapper_cublas_sgemm(buf_h2_gpu3, buf_weights2_T_gpu3, buf_tmp2_gpu3, (uint64_t)BATCH_SIZE, (uint64_t)(4 * FEATURE_SIZE), (uint64_t)FEATURE_SIZE, 1.000000f, 1.000000f, (uint64_t)0, (uint64_t)0, (uint64_t)0, uint64_t(((((c3*(SEQ_LENGTH/2 + 1)) + (((c1 - c3)*GEMM_BATCH) + c5))*BATCH_SIZE*FEATURE_SIZE) - (4 * (SEQ_LENGTH/2 + 1) * BATCH_SIZE * FEATURE_SIZE))), uint64_t(((c3 * 2 * 4 * FEATURE_SIZE * FEATURE_SIZE) - (9 * 4 * FEATURE_SIZE * FEATURE_SIZE))), uint64_t(((((c1 - c3) * GEMM_BATCH) + c5) * BATCH_SIZE * 4 * FEATURE_SIZE)), (uint32_t)0, (uint32_t)0);
                     _kernel_17_wrapper(c1, c3, c5, buf_biases2_gpu3, buf_c2_gpu3, buf_h2_gpu3, buf_tmp2_gpu3);
                 }
             }
