@@ -14,14 +14,23 @@
 
 #define GEMM_BATCH 10
 
-#define WEIGHTS_SIZE 33554432
-#define BIASES_SIZE 32768
+#define WEIGHTS_SIZE (2 * NUM_LAYERS * 4 * FEATURE_SIZE * FEATURE_SIZE * 4)
+#define BIASES_SIZE (4 * FEATURE_SIZE * NUM_LAYERS * 4)
 
-#define WEIGHTS2_SIZE 33554432
-#define BIASES2_SIZE 32768
+#define WEIGHTS2_SIZE (2 * NUM_LAYERS * 4 * FEATURE_SIZE * FEATURE_SIZE * 4)
+#define BIASES2_SIZE (4 * FEATURE_SIZE * NUM_LAYERS * 4)
 
-#define X_SIZE 13107200
-#define Y_SIZE 6553600
+#define X_SIZE (FEATURE_SIZE * BATCH_SIZE * SEQ_LENGTH * 4)
+#define Y_SIZE (FEATURE_SIZE * BATCH_SIZE * (SEQ_LENGTH / 2) * 4)
+
+#define TMP_SIZE (SEQ_LENGTH * BATCH_SIZE * 4 * FEATURE_SIZE * 4)
+#define TMP2_SIZE ((SEQ_LENGTH / 2) * BATCH_SIZE * 4 * FEATURE_SIZE * 4)
+
+#define H_SIZE ((NUM_LAYERS + 1)* (SEQ_LENGTH + 1) * BATCH_SIZE * FEATURE_SIZE * 4)
+#define H2_SIZE ((NUM_LAYERS)* (SEQ_LENGTH/2 + 1) * BATCH_SIZE * FEATURE_SIZE * 4)
+
+#define C_SIZE ((NUM_LAYERS)* (SEQ_LENGTH + 1) * BATCH_SIZE * FEATURE_SIZE * 4)
+#define C2_SIZE ((NUM_LAYERS)* (SEQ_LENGTH/2 + 1) * BATCH_SIZE * FEATURE_SIZE * 4)
 
 #define NB_TIMES 1000
 bool first_execution = true;
@@ -39,16 +48,16 @@ void deepspeech2(float *buf_Weights_cpu, float *buf_biases_cpu,
       wrapper_cuda_device_enable_peer_access(GPU3_ID, 0);
     }
     float *buf_x_gpu1, *buf_weights_gpu1, *buf_biases_gpu1, *buf_tmp_gpu1, *buf_weights_T_gpu1, *buf_h_gpu1, *buf_c_gpu1;
-    buf_x_gpu1 = (float *) wrapper_cuda_malloc((uint64_t)13107200);
-    buf_weights_gpu1 = (float *) wrapper_cuda_malloc((uint64_t)33554432);
-    buf_biases_gpu1 = (float *) wrapper_cuda_malloc((uint64_t)32768);
-    buf_tmp_gpu1 = (float *) wrapper_cuda_malloc((uint64_t)52428800);
-    buf_weights_T_gpu1 = (float *) wrapper_cuda_malloc((uint64_t)33554432);
-    buf_h_gpu1 = (float *) wrapper_cuda_malloc((uint64_t)66191360);
-    buf_c_gpu1 = (float *) wrapper_cuda_malloc((uint64_t)52953088);
+    buf_x_gpu1 = (float *) wrapper_cuda_malloc((uint64_t)X_SIZE);
+    buf_weights_gpu1 = (float *) wrapper_cuda_malloc((uint64_t)WEIGHTS_SIZE);
+    buf_biases_gpu1 = (float *) wrapper_cuda_malloc((uint64_t)BIASES_SIZE);
+    buf_tmp_gpu1 = (float *) wrapper_cuda_malloc((uint64_t)TMP_SIZE);
+    buf_weights_T_gpu1 = (float *) wrapper_cuda_malloc((uint64_t)WEIGHTS_SIZE);
+    buf_h_gpu1 = (float *) wrapper_cuda_malloc((uint64_t)H_SIZE);
+    buf_c_gpu1 = (float *) wrapper_cuda_malloc((uint64_t)C_SIZE);
 
-    wrapper_cuda_memcpy_to_device(buf_weights_gpu1, buf_Weights_cpu, (uint64_t)33554432);
-    wrapper_cuda_memcpy_to_device(buf_biases_gpu1, buf_biases_cpu, (uint64_t)32768);
+    wrapper_cuda_memcpy_to_device(buf_weights_gpu1, buf_Weights_cpu, (uint64_t)WEIGHTS_SIZE);
+    wrapper_cuda_memcpy_to_device(buf_biases_gpu1, buf_biases_cpu, (uint64_t)BIASES_SIZE);
 
 /** GPU2 INITIALIZATIONS */
     wrapper_cuda_set_device(GPU2_ID);
@@ -57,26 +66,26 @@ void deepspeech2(float *buf_Weights_cpu, float *buf_biases_cpu,
       wrapper_cuda_device_enable_peer_access(GPU3_ID, 0);
     }
     float *buf_weights_gpu2, *buf_biases_gpu2, *buf_tmp_gpu2, *buf_weights_T_gpu2, *buf_h_gpu2, *buf_c_gpu2, *buf_weights2_gpu2, *buf_biases2_gpu2, *buf_weights2_T_gpu2;
-    buf_weights_gpu2 = (float *) wrapper_cuda_malloc((uint64_t)33554432);
-    buf_biases_gpu2 = (float *) wrapper_cuda_malloc((uint64_t)32768);
-    buf_tmp_gpu2 = (float *) wrapper_cuda_malloc((uint64_t)52428800);
+    buf_weights_gpu2 = (float *) wrapper_cuda_malloc((uint64_t)WEIGHTS_SIZE);
+    buf_biases_gpu2 = (float *) wrapper_cuda_malloc((uint64_t)BIASES_SIZE);
+    buf_tmp_gpu2 = (float *) wrapper_cuda_malloc((uint64_t)TMP_SIZE);
 
-    buf_weights_T_gpu2 = (float *) wrapper_cuda_malloc((uint64_t)33554432);
-    buf_h_gpu2 = (float *) wrapper_cuda_malloc((uint64_t)66191360);
-    buf_c_gpu2 = (float *) wrapper_cuda_malloc((uint64_t)52953088);
+    buf_weights_T_gpu2 = (float *) wrapper_cuda_malloc((uint64_t)WEIGHTS_SIZE);
+    buf_h_gpu2 = (float *) wrapper_cuda_malloc((uint64_t)H_SIZE);
+    buf_c_gpu2 = (float *) wrapper_cuda_malloc((uint64_t)C_SIZE);
 
-    buf_weights2_gpu2 = (float *) wrapper_cuda_malloc((uint64_t)33554432);
-    buf_biases2_gpu2 = (float *) wrapper_cuda_malloc((uint64_t)32768);
-    buf_weights2_T_gpu2 = (float *) wrapper_cuda_malloc((uint64_t)33554432);
+    buf_weights2_gpu2 = (float *) wrapper_cuda_malloc((uint64_t)WEIGHTS2_SIZE);
+    buf_biases2_gpu2 = (float *) wrapper_cuda_malloc((uint64_t)BIASES2_SIZE);
+    buf_weights2_T_gpu2 = (float *) wrapper_cuda_malloc((uint64_t)WEIGHTS2_SIZE);
 
-    wrapper_cuda_memcpy_to_device(buf_weights_gpu2, buf_Weights_cpu, (uint64_t)33554432);
-    wrapper_cuda_memcpy_to_device(buf_biases_gpu2, buf_biases_cpu, (uint64_t)32768);
-    wrapper_cuda_memcpy_to_device(buf_weights2_gpu2, buf_Weights2_cpu, (uint64_t)33554432);
-    wrapper_cuda_memcpy_to_device(buf_biases2_gpu2, buf_biases2_cpu, (uint64_t)32768);
+    wrapper_cuda_memcpy_to_device(buf_weights_gpu2, buf_Weights_cpu, (uint64_t)WEIGHTS_SIZE);
+    wrapper_cuda_memcpy_to_device(buf_biases_gpu2, buf_biases_cpu, (uint64_t)BIASES_SIZE);
+    wrapper_cuda_memcpy_to_device(buf_weights2_gpu2, buf_Weights2_cpu, (uint64_t)WEIGHTS2_SIZE);
+    wrapper_cuda_memcpy_to_device(buf_biases2_gpu2, buf_biases2_cpu, (uint64_t)BIASES2_SIZE);
 
 /** GPU3 INITIALIZATIONS */
     wrapper_cuda_set_device(GPU3_ID);
-    float *buf_y_gpu = (float *) wrapper_cuda_malloc((uint64_t)6553600);
+    float *buf_y_gpu = (float *) wrapper_cuda_malloc((uint64_t)Y_SIZE);
 
     if(first_execution && ENABLE_PEER_ACCESS){
       wrapper_cuda_device_enable_peer_access(GPU1_ID, 0);
@@ -84,21 +93,21 @@ void deepspeech2(float *buf_Weights_cpu, float *buf_biases_cpu,
     }
 
     float *buf_weights2_gpu3, *buf_biases2_gpu3, *buf_tmp2_gpu3, *buf_weights2_T_gpu3, *buf_h2_gpu3, *buf_c2_gpu3;
-    buf_weights2_gpu3 = (float *) wrapper_cuda_malloc((uint64_t)33554432);
-    buf_biases2_gpu3 = (float *) wrapper_cuda_malloc((uint64_t)32768);
-    buf_tmp2_gpu3 = (float *) wrapper_cuda_malloc((uint64_t)26214400);
+    buf_weights2_gpu3 = (float *) wrapper_cuda_malloc((uint64_t)WEIGHTS2_SIZE);
+    buf_biases2_gpu3 = (float *) wrapper_cuda_malloc((uint64_t)BIASES2_SIZE);
+    buf_tmp2_gpu3 = (float *) wrapper_cuda_malloc((uint64_t)TMP2_SIZE);
 
-    buf_weights2_T_gpu3 = (float *) wrapper_cuda_malloc((uint64_t)33554432);
-    buf_h2_gpu3 = (float *) wrapper_cuda_malloc((uint64_t)33423360);
-    buf_c2_gpu3 = (float *) wrapper_cuda_malloc((uint64_t)26738688);
+    buf_weights2_T_gpu3 = (float *) wrapper_cuda_malloc((uint64_t)WEIGHTS2_SIZE);
+    buf_h2_gpu3 = (float *) wrapper_cuda_malloc((uint64_t)H2_SIZE);
+    buf_c2_gpu3 = (float *) wrapper_cuda_malloc((uint64_t)C2_SIZE);
 
-    wrapper_cuda_memcpy_to_device(buf_weights2_gpu3, buf_Weights2_cpu, (uint64_t)33554432);
-    wrapper_cuda_memcpy_to_device(buf_biases2_gpu3, buf_biases2_cpu, (uint64_t)32768);
+    wrapper_cuda_memcpy_to_device(buf_weights2_gpu3, buf_Weights2_cpu, (uint64_t)WEIGHTS2_SIZE);
+    wrapper_cuda_memcpy_to_device(buf_biases2_gpu3, buf_biases2_cpu, (uint64_t)BIASES2_SIZE);
 
     time_start[0] = get_time(0);
 
     wrapper_cuda_set_device(GPU1_ID);
-    wrapper_cuda_memcpy_to_device(buf_x_gpu1, buf_x_cpu, (uint64_t)13107200);
+    wrapper_cuda_memcpy_to_device(buf_x_gpu1, buf_x_cpu, (uint64_t)X_SIZE);
 
     _kernel_0_wrapper(buf_weights_gpu1, buf_weights_T_gpu1);
     _kernel_1_wrapper(buf_h_gpu1);
@@ -190,7 +199,7 @@ void deepspeech2(float *buf_Weights_cpu, float *buf_biases_cpu,
     wrapper_cuda_set_device(GPU3_ID);
     _kernel_18_wrapper(buf_y_gpu, buf_h2_gpu3);
     wrapper_cuda_stream_synchronize(0);
-    wrapper_cuda_memcpy_to_host(buf_y_cpu, buf_y_gpu, (uint64_t)6553600);
+    wrapper_cuda_memcpy_to_host(buf_y_cpu, buf_y_gpu, (uint64_t)Y_SIZE);
 
     //// Wait for all threads
     wrapper_cuda_set_device(GPU3_ID);
