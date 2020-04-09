@@ -3,6 +3,8 @@
 #define NUM_LAYERS int32_t(4)  // 4
 #define SEQ_LENGTH int32_t(100)  // 100
 
+#define GEMM_BATCH 50
+
 #if 1  // Flip to use double precision
     #define DATA_TYPE float
     #define DATA_TYPE_P p_float32

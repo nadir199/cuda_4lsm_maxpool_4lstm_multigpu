@@ -12,8 +12,7 @@
 #define GPU3_ID 2
 #define ENABLE_PEER_ACCESS 1
 
-#define GEMM_BATCH 10
-
+// Buffer sizes
 #define WEIGHTS_SIZE (2 * NUM_LAYERS * 4 * FEATURE_SIZE * FEATURE_SIZE * 4)
 #define BIASES_SIZE (4 * FEATURE_SIZE * NUM_LAYERS * 4)
 
@@ -153,7 +152,7 @@ void deepspeech2(float *buf_Weights_cpu, float *buf_biases_cpu,
             }
             if ((c3 == 3))
               for (int c5 = 0; c5 < 2; c5++) {
-                  wrapper_cublas_sgemm(buf_h_gpu2, buf_weights_T_gpu2, buf_tmp_gpu2, (uint64_t)(GEMM_BATCH * BATCH_SIZE), (uint64_t)(4 * FEATURE_SIZE), (uint64_t)FEATURE_SIZE, 1.000000f, 0.000000f, (uint64_t)0, (uint64_t)0, (uint64_t)0, uint64_t(((((c1*2) + c5)*GEMM_BATCH*BATCH_SIZE*FEATURE_SIZE) + (3 * (SEQ_LENGTH + 1) - 3 * 2 * GEMM_BATCH + 1) * BATCH_SIZE * FEATURE_SIZE)), (uint64_t)6291456, uint64_t(((((c1*2) + c5)*1310720) + -7864320)), (uint32_t)0, (uint32_t)0);
+                  wrapper_cublas_sgemm(buf_h_gpu2, buf_weights_T_gpu2, buf_tmp_gpu2, (uint64_t)(GEMM_BATCH * BATCH_SIZE), (uint64_t)(4 * FEATURE_SIZE), (uint64_t)FEATURE_SIZE, 1.000000f, 0.000000f, (uint64_t)0, (uint64_t)0, (uint64_t)0, uint64_t(((((c1*2) + c5)*GEMM_BATCH*BATCH_SIZE*FEATURE_SIZE) + (3 * (SEQ_LENGTH + 1) - 3 * 2 * GEMM_BATCH + 1) * BATCH_SIZE * FEATURE_SIZE)), (uint64_t)(3 * 2 * 4 * FEATURE_SIZE * FEATURE_SIZE), uint64_t(((((c1*2) + c5) * GEMM_BATCH * BATCH_SIZE * 4 * FEATURE_SIZE) - (3 * 2 * GEMM_BATCH * BATCH_SIZE * 4 * FEATURE_SIZE))), (uint32_t)0, (uint32_t)0);
 
                   for (int c7 = 0; c7 < GEMM_BATCH; c7++) {
                       wrapper_cublas_sgemm(buf_h_gpu2, buf_weights_T_gpu2, buf_tmp_gpu2, (uint64_t)BATCH_SIZE, (uint64_t)(4 * FEATURE_SIZE), (uint64_t)FEATURE_SIZE, 1.000000f, 1.000000f, (uint64_t)0, (uint64_t)0, (uint64_t)0, uint64_t(((((((c1*GEMM_BATCH) + c7)*2) + c5)*BATCH_SIZE * FEATURE_SIZE) + (4 * (SEQ_LENGTH + 1) - 3 * 2 * GEMM_BATCH) * BATCH_SIZE * FEATURE_SIZE)), (uint64_t)(7 * 4 * FEATURE_SIZE * FEATURE_SIZE), uint64_t(((((((c1*GEMM_BATCH) + c7)*2) + c5)*BATCH_SIZE * 4 * FEATURE_SIZE) - 3 * GEMM_BATCH * 2 * BATCH_SIZE * 4 * FEATURE_SIZE)), (uint32_t)0, (uint32_t)0);
